@@ -1,5 +1,22 @@
 import os
 
+schema_get_files_info = {
+    "type": "function",
+    "function": {
+        "name": "get_files_info",
+        "description": "Lists file information from files in a specified directory relative to an internal working directory, providing file size and directory status for each file found",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "directory": {
+                    "type": "string",
+                    "description": "Directory path to gather file information from relative to the internal working directory (default is the working directory itself)",
+                },
+            },
+        },
+    },
+}
+
 def get_files_info(working_dir: str, directory: str = ".") -> str:
     target_dir = None
     try:
