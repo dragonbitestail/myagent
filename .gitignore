@@ -13,3 +13,6 @@ wheels/
 NOTE*
 
 .env
+
+# Additional transient local files
+*.swp
