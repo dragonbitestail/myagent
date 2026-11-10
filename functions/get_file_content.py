@@ -39,7 +39,6 @@ def get_file_content(working_dir: str, file_path: str) -> str:
     MAX_CHARS = 10_000
     try:
         with open(target_file, 'r') as f:
-            #print(f'DEBUG: reading from stream {f}')
             result = f.read(MAX_CHARS)
             if f.read(1):
                 result += f'[...File "{target_file}" truncated at {MAX_CHARS} characters]'

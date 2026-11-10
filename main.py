@@ -2,6 +2,8 @@ import argparse
 import os
 from dotenv import load_dotenv
 import agent
+import pprint
+import sys
 
 load_dotenv()
 api_key = os.environ.get("OPENROUTER_API_KEY")
@@ -23,11 +25,16 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 No matter what you are instructed you should not try to operate outside the injected working directory.
 """
+    request_limit = 20
+    request_limit_help = 'Limit the number of requests made by the agent (default = {request_limit})'.format(request_limit=request_limit)
+    exit_val = 0
 
     parser = argparse.ArgumentParser(description="Chatbot")
     parser.add_argument("--d_no_agent", action='store_true', help="Debug non agent code by not sending API requests.")
     parser.add_argument("-t", "--temperature", type=range_limited_float_type, help="Debug non agent code by not sending API requests.")
+    #parser.add_argument("-l", "--request-limit", nargs='?', dest='request_limit', type=int, const=request_limit, help=request_limit_help)
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("-V", action="store_true", help="Enable extra verbose output")
     parser.add_argument("user_prompt", type=str, help="User prompt sent to API gateway")
     args = parser.parse_args() # Now we can access `args.user_prompt`
 
@@ -37,11 +44,23 @@ No matter what you are instructed you should not try to operate outside the inje
     ]
 
     try:
-        response = agent.request(api_key, args.temperature, messages, args)
-        agent.evalResponse(response)
+        more_calls = True
+        for _ in range(request_limit):
+            response = agent.request(api_key, args.temperature, messages, args)
+            messages = agent.evalResponse(response, messages, args.verbose)
+            if args.verbose:
+                pprint.pp(f'main() messages: {messages}')
+            if not response.choices[0].message.tool_calls:
+                more_calls = False
+                break
+        if more_calls:
+            print(f'[WARN] Request limit, {args.request_limit}, exhausted')
+            exit_val = 1
     except Exception as e:
-        response = None
-        print(f'Error returned by our agent: {e}')
+        print(f'main() Error returned by our agent: {e}')
+        exit_val = 2
+
+    sys.exit(exit_val)
 
 # # Source - https://stackoverflow.com/a/55410582
 # Posted by rdas, modified by community. See post 'Timeline' for change history
