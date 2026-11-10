@@ -9,7 +9,7 @@ Implementation of Boot.Dev course: Build an AI Agent in Python.
 
 # WARNING
 
-This is a test project by an amateur hobbyist with very limited experience in 
+This is a test project by an amateur hobbyist with very limited experience in
 AI.  As guided by the course, attempts were made to limit this AI agent's
 access to files outside the working directory's sample calculator app
 sub-directory of this agent but, caution should still be exercised when running
